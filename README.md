@@ -1,1 +1,2 @@
 # LPDIM2016
+Projet en LPDIM 2016
