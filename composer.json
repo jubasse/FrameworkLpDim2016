@@ -11,12 +11,12 @@
     ],
     "autoload": {
         "psr-4": {
-            "": "src"
+            "": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "": "test"
+            "Tests\\": "tests/"
         }
     },
     "minimum-stability": "dev",

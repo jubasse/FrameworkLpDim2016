@@ -12,16 +12,19 @@ class Request
     const METHOD_TRACE = 'TRACE';
     const METHOD_PATCH = 'PATCH';
 
+    const HTTP = 'HTTP';
+    const HTTPS = 'HTTPS';
+
+    const VERSION_1_0 = "1.0";
+    const VERSION_1_1 = "1.1";
+    const VERSION_2_0 = "2.0";
+
     private $body;
     private $method;
     private $scheme;
     private $schemeVersion;
     private $path;
     private $headers;
-
-    const HTTP = 'HTTP';
-    const HTTPS = 'HTTPS';
-
     /**
      * @param $method
      * @param $path
