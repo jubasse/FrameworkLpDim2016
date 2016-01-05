@@ -1,4 +1,5 @@
 <?php
+namespace Framework\Http;
 class Request
 {
     const METHOD_GET = 'GET';
@@ -6,6 +7,7 @@ class Request
     const METHOD_PUT = 'PUT';
     const METHOD_DELETE = 'DELETE';
     const METHOD_OPTIONS = 'OPTIONS';
+    const METHOD_CONNECT = 'CONNECT';
     const METHOD_HEAD = 'HEAD';
     const METHOD_TRACE = 'TRACE';
     const METHOD_PATCH = 'PATCH';
@@ -21,21 +23,60 @@ class Request
     const HTTPS = 'HTTPS';
 
     /**
-     * @param string $method            http verb
-     * @param string $path              ressource path on the server
-     * @param string $scheme            protocol name
-     * @param string $schemeVersion     scheme version
-     * @param array  $headers           all the headers
-     * @param string $body              the body
+     * @param $method
+     * @param $path
+     * @param $scheme
+     * @param $schemeVersion
+     * @param array $headers
+     * @param $body
      */
     public function __construct(string $method,string $path,string $scheme,string $schemeVersion,array $headers = [],string $body = ''){
 
         $this->body = $body;
-        $this->method = $method;
-        $this->scheme = $scheme;
+        $this->setMethod($method);
+        $this->setScheme($scheme);
         $this->schemeVersion = $schemeVersion;
         $this->path = $path;
         $this->headers = $headers;
+    }
+
+    /**
+     * @param $method
+     */
+    private function setMethod($method){
+        $methodArray = [
+          self::METHOD_HEAD,
+          self::METHOD_GET,
+          self::METHOD_POST,
+          self::METHOD_PUT,
+          self::METHOD_CONNECT,
+          self::METHOD_OPTIONS,
+          self::METHOD_DELETE,
+          self::METHOD_TRACE,
+          self::METHOD_PATCH,
+        ];
+
+        if(!in_array($method,$methodArray)){
+            throw new \InvalidArgumentException("Method \"$method\" is not a supported HTTP method");
+        }
+
+        $this->method = $method;
+    }
+
+    /**
+     * @param $scheme
+     */
+    private function setScheme($scheme){
+        $schemeArray = [
+          self::HTTP,
+          self::HTTPS,
+        ];
+
+        if(!in_array($scheme,$schemeArray)){
+            throw new \InvalidArgumentException("Scheme \"$scheme\" is not a supported HTTP method");
+        }
+
+        $this->scheme = $scheme;
     }
 
     public function getPath()
