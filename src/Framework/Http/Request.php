@@ -33,20 +33,61 @@ class Request
      * @param array $headers
      * @param $body
      */
-    public function __construct(string $method,string $path,string $scheme,string $schemeVersion,array $headers = [],string $body = ''){
-
+    public function __construct(string $method,string $path,string $scheme,string $schemeVersion,array $headers = [],string $body = '')
+    {
         $this->body = $body;
         $this->setMethod($method);
         $this->setScheme($scheme);
-        $this->schemeVersion = $schemeVersion;
+        $this->setSchemeVersion($schemeVersion);
         $this->path = $path;
-        $this->headers = $headers;
+        $this->setHeaders($headers);
     }
 
     /**
+     * @param array $headers
+     */
+    private function setHeaders(array $headers)
+    {
+        foreach($headers as $header => $value){
+            $this->addHeader($header,$value);
+        }
+    }
+
+    /**
+     * @param $header
+     * @param $value
+     *
+     * @throws \RuntimeException
+     */
+    private function addHeader(string $header,string $value)
+    {
+        $header = strtolower($header);
+        if(isset($this->headers[$header])){
+            throw new \RuntimeException(
+                "Header $header is already defined you cannot set it twice"
+            );
+        }
+        $this->headers[$header] = $value;
+    }
+
+    public function getMessage()
+    {
+        $message = $this->getMethod();
+        return $message;
+    }
+
+    /**
+     * @param $header
+     * @return null or header
+     */
+    public function getHeader(string $header)
+    {
+        return ($this->headers[strtolower($header)]) ?: null;
+    }
+    /**
      * @param $method
      */
-    private function setMethod($method){
+    private function setMethod(string $method){
         $methodArray = [
           self::METHOD_HEAD,
           self::METHOD_GET,
@@ -60,7 +101,7 @@ class Request
         ];
 
         if(!in_array($method,$methodArray)){
-            throw new \InvalidArgumentException("Method \"$method\" is not a supported HTTP method");
+            throw new \InvalidArgumentException("Method \"$method\" is not a supported");
         }
 
         $this->method = $method;
@@ -69,17 +110,31 @@ class Request
     /**
      * @param $scheme
      */
-    private function setScheme($scheme){
+    private function setScheme(string $scheme){
         $schemeArray = [
           self::HTTP,
           self::HTTPS,
         ];
 
         if(!in_array($scheme,$schemeArray)){
-            throw new \InvalidArgumentException("Scheme \"$scheme\" is not a supported HTTP method");
+            throw new \InvalidArgumentException("Scheme \"$scheme\" is not a supported");
         }
 
         $this->scheme = $scheme;
+    }
+
+    private function setSchemeVersion(string $schemeVersion){
+        $schemeVersionsArray = [
+          self::VERSION_1_0,
+          self::VERSION_1_1,
+          self::VERSION_2_0,
+        ];
+
+        if(!in_array($schemeVersion,$schemeVersionsArray)){
+            throw new \InvalidArgumentException("SchemeVersion \"$schemeVersion\" is not a supported");
+        }
+
+        $this->schemeVersion = $schemeVersion;
     }
 
     public function getPath()
