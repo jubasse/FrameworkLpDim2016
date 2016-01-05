@@ -1,0 +1,24 @@
+{
+    "name": "julien/lpdim2016",
+    "description": "Another PHP Framework",
+    "type": "library",
+    "license": "proprietaire",
+    "authors": [
+        {
+            "name": "jubasse",
+            "email": "julien-basse-01@hotmail.fr"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "": "test"
+        }
+    },
+    "minimum-stability": "dev",
+    "require": {}
+}
