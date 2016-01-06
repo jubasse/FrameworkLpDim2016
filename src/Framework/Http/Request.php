@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 namespace Framework\Http;
 class Request
 {
@@ -70,10 +71,59 @@ class Request
         $this->headers[$header] = $value;
     }
 
+    public function getPrologue()
+    {
+        return $this->method." ".$this->path." ".$this->scheme."/".$this->schemeVersion;
+    }
+
+    public static function createFromMessage(string $message)
+    {
+        if(!is_string($message) || empty($message)){
+            throw new \MalformedHttpMessageException($message,'HTTP Message is not valid');
+        }
+        $lines = explode(PHP_EOL,$message);
+        $result = preg_match("#^(?P<method>[A-Z]{3,7}) (?P<path>.+) (?P<scheme>HTTPS?)\/(?P<version>[1-2]\.[0-2])$#",$lines[0],$matches);
+        if(!$result){
+            throw new \MalformedHttpMessageException($message,'HTTP Message prologue is malformed');
+        }
+        array_shift($lines);
+        $headers = [];
+        $i = 0;
+        while($line = $lines[$i]){
+            $result = preg_match("#^(?P<header>[a-z][a-z0-9\-]+)\: (?P<value>.+)$#i",$line,$header);
+            if(!$result){
+                throw new \MalformedHttpHeaderException($message,"Invalid header line at position ".($i+2).": ".$line);
+            }
+            $headers[$header["header"]] = $header["value"];
+            $i++;
+        }
+        $i++;
+        $body = "";
+        if(isset($lines[$i])){
+            $body = $lines[$i];
+        }
+        return new self($matches["method"],$matches["path"],$matches["scheme"],$matches["version"],$headers,$body);
+    }
+
     public function getMessage()
     {
-        $message = $this->getMethod();
+        $message = $this->getPrologue();
+        $message .= PHP_EOL;
+        if(count($this->headers)){
+            foreach($this->headers as $header => $value){
+                $message .= $header.": ".$value.PHP_EOL;
+            }
+        }
+        $message .= PHP_EOL;
+        if($this->body){
+            $message .= $this->body;
+        }
         return $message;
+    }
+
+    public function __toString()
+    {
+        return $this->getMessage();
     }
 
     /**
@@ -84,6 +134,7 @@ class Request
     {
         return ($this->headers[strtolower($header)]) ?: null;
     }
+
     /**
      * @param $method
      */

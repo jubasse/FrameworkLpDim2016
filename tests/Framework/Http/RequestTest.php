@@ -77,6 +77,36 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         new Request($method,"/",Request::HTTP,"1.1");
     }
 
+    public function testToStringHttp()
+    {
+        $message = 'GET /home HTTP/1.1
+content-type: application/json
+
+{"foo":"bar"}';
+        $request = new Request(Request::METHOD_GET,"/home",Request::HTTP,Request::VERSION_1_1,[
+           "Content-Type" => "application/json"
+        ],'{"foo":"bar"}');
+
+        $this->assertSame($message,(string) $request);
+    }
+
+    public function testCreateRequestFromMessage()
+    {
+        $message = <<<MESSAGE
+GET /fr/article/42 HTTP/1.1
+host: http://wikipedia.com
+user-agent: Mozilla/Firefox
+accept: text/plain, text/html
+
+{"foo": "bar"}
+MESSAGE;
+
+        $request = Request::createFromMessage($message);
+
+        $this->assertInstanceOf(Request::class, $request);
+        $this->assertSame($message, $request->getMessage());
+        $this->assertSame($message, (string) $request);
+    }
     /**
      * @expectedException \InvalidArgumentException
      * @dataProvider provideInvalidHttpScheme
