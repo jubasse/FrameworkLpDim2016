@@ -35,33 +35,40 @@ class Request extends AbstractMessage
         return $this->method." ".$this->path." ".$this->scheme."/".$this->schemeVersion;
     }
 
-    public static function createFromMessage(string $message)
+    /**
+     * @param $message
+     * @return mixed
+     * @throws \MalformedHttpMessageException
+     */
+    private static function parsePrologue(string $message)
     {
-        if(!is_string($message) || empty($message)){
-            throw new \MalformedHttpMessageException($message,'HTTP Message is not valid');
-        }
         $lines = explode(PHP_EOL,$message);
         $result = preg_match("#^(?P<method>[A-Z]{3,7}) (?P<path>.+) (?P<scheme>HTTPS?)\/(?P<version>[1-2]\.[0-2])$#",$lines[0],$matches);
         if(!$result){
             throw new \MalformedHttpMessageException($message,'HTTP Message prologue is malformed');
         }
-        array_shift($lines);
-        $headers = [];
-        $i = 0;
-        while($line = $lines[$i]){
-            $result = preg_match("#^(?P<header>[a-z][a-z0-9\-]+)\: (?P<value>.+)$#i",$line,$header);
-            if(!$result){
-                throw new \MalformedHttpHeaderException($message,"Invalid header line at position ".($i+2).": ".$line);
-            }
-            $headers[$header["header"]] = $header["value"];
-            $i++;
+        return $matches;
+    }
+
+    /**
+     * @param $message
+     * @return Request
+     * @throws \MalformedHttpMessageException
+     */
+    final public static function createFromMessage(string $message)
+    {
+        if(!is_string($message) || empty($message)) {
+            throw new \MalformedHttpMessageException($message, 'HTTP Message is not valid');
         }
-        $i++;
-        $body = "";
-        if(isset($lines[$i])){
-            $body = $lines[$i];
-        }
-        return new self($matches["method"],$matches["path"],$matches["scheme"],$matches["version"],$headers,$body);
+        $prologue = self::parsePrologue($message);
+        return new self(
+            $prologue["method"],
+            $prologue["path"],
+            $prologue["scheme"],
+            $prologue["version"],
+            static::parseHeaders($message),
+            static::parseBody($message)
+        );
     }
 
     /**

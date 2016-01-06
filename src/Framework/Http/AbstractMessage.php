@@ -135,6 +135,33 @@ abstract class AbstractMessage
         return $message;
     }
 
+    protected static function parseBody(string $message)
+    {
+        $pos = strpos($message,PHP_EOL.PHP_EOL);
+        return (string) (substr($message, $pos+4));
+    }
+
+    protected static function parseHeaders($message)
+    {
+        $start = strpos($message,PHP_EOL) + 2;
+        $end = strpos($message,PHP_EOL.PHP_EOL);
+        $length = $end - $start;
+        $lines = explode(PHP_EOL,substr($message, $start, $length));
+
+        $i = 0;
+        $headers = [];
+        while(!empty($lines[$i])){
+            $line = $lines[$i];
+            $result = preg_match("#^(?P<header>[a-z][a-z0-9\-]+)\: (?P<value>.+)$#i",$line,$header);
+            if(!$result){
+                throw new MalformedHttpHeaderException("Invalid header line at position ".($i+2).": ".$line);
+            }
+            $headers[$header["header"]] = $header["value"];
+            $i++;
+        }
+        return $headers;
+    }
+
     public function __toString()
     {
         return $this->getMessage();
