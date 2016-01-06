@@ -1,18 +1,8 @@
 <?php
 declare(strict_types = 1);
 namespace Framework\Http;
-class Request extends AbstractMessage
+class Request extends AbstractMessage implements RequestInterface
 {
-    const METHOD_GET = 'GET';
-    const METHOD_POST = 'POST';
-    const METHOD_PUT = 'PUT';
-    const METHOD_DELETE = 'DELETE';
-    const METHOD_OPTIONS = 'OPTIONS';
-    const METHOD_CONNECT = 'CONNECT';
-    const METHOD_HEAD = 'HEAD';
-    const METHOD_TRACE = 'TRACE';
-    const METHOD_PATCH = 'PATCH';
-
     private $method;
     private $path;
     /**

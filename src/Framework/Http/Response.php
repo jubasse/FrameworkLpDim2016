@@ -9,7 +9,7 @@
 namespace Framework\Http;
 
 
-class Response extends AbstractMessage
+class Response extends AbstractMessage implements ResponseInterface
 {
     public $statusCode;
 
@@ -32,7 +32,6 @@ class Response extends AbstractMessage
       500 => 'Internal Server Error',
       502 => 'Bad Gateway',
       503 => 'Service Unavailable',
-
     ];
 
     public function __construct($statusCode,$scheme,$schemeVersion, array $headers,$body)
