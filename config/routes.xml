@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<routes>
+    <route name="hello" path="/hello">
+        <param key="_controller">Application\Controller\HelloWorldController</param>
+    </route>
+    <route name="test" path="/test">
+        <param key="_controller">Application\Controller\HelloWorldController</param>
+    </route>
+</routes>
