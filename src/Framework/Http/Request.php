@@ -93,4 +93,9 @@ class Request extends AbstractMessage implements RequestInterface
     {
         return $this->method;
     }
+
+    public function send()
+    {
+        // TODO: Implement send() method.
+    }
 }
