@@ -20,6 +20,13 @@ class Request extends AbstractMessage implements RequestInterface
         parent::__construct($scheme,$schemeVersion,$headers,$body);
     }
 
+    public static function createFromGlobals()
+    {
+        $path = isset($_SERVER["PATH_INFO"]) ? $_SERVER["PATH_INFO"] : "/";
+        $protocol = explode("/",$_SERVER["SERVER_PROTOCOL"]);
+        return new self($_SERVER["REQUEST_METHOD"],$path,$protocol[0],$protocol[1]);
+    }
+
     protected function createPrologue()
     {
         return $this->method." ".$this->path." ".$this->scheme."/".$this->schemeVersion;

@@ -3,14 +3,15 @@
 use Framework\Http\Request;
 use Framework\Http\StreamableInterface;
 use Framework\Kernel;
+use Framework\Routing\Router;
 
 require_once __DIR__."/../vendor/autoload.php";
 
-$path = isset($_SERVER["PATH_INFO"]) ? $_SERVER["PATH_INFO"] : "/";
-$protocol = explode("/",$_SERVER["SERVER_PROTOCOL"]);
-$request = new Request($_SERVER["REQUEST_METHOD"],$_SERVER["REQUEST_URI"],$protocol[0],$protocol[1]);
-$kernel = new Kernel();
-$response = $kernel->handle($request);
+$router = new Router(include(__DIR__."/../config/routes.php"));
+$kernel = new Kernel($router);
+
+$response = $kernel->handle(Request::createFromGlobals());
+
 if($response instanceof StreamableInterface){
     $response->send();
 }
