@@ -1,13 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Julien
- * Date: 06/01/2016
- * Time: 11:41
- */
 
 namespace Framework\Http;
-
 
 abstract class AbstractMessage implements MessageInterface
 {
@@ -19,6 +12,12 @@ abstract class AbstractMessage implements MessageInterface
     protected $headers;
     protected $body;
 
+    /**
+     * @param $scheme
+     * @param $schemeVersion
+     * @param $headers
+     * @param $body
+     */
     public function __construct(string $scheme,$schemeVersion,$headers,$body)
     {
         $this->headers = [];
@@ -116,12 +115,11 @@ abstract class AbstractMessage implements MessageInterface
         return $headers;
     }
 
+
     /**
      * @param $name
-* @param $value
-*
-* @throws \RuntimeException
-*/
+     * @param $value
+     */
     private function addHeader(string $name,$value)
     {
         if($this->findHeader($name)){
@@ -150,13 +148,21 @@ abstract class AbstractMessage implements MessageInterface
         return $message;
     }
 
+    /**
+     * @param $message
+     * @return string
+     */
     protected static function parseBody(string $message)
     {
         $pos = strpos($message,PHP_EOL.PHP_EOL);
         return (string) (substr($message, $pos+4));
     }
 
-    protected static function parseHeaders($message)
+    /**
+     * @param $message
+     * @return array
+     */
+    protected static function parseHeaders(string $message)
     {
         $start = strpos($message,PHP_EOL) + 2;
         $end = strpos($message,PHP_EOL.PHP_EOL);
@@ -172,6 +178,11 @@ abstract class AbstractMessage implements MessageInterface
         return $headers;
     }
 
+    /**
+     * @param $line
+     * @param $position
+     * @return array
+     */
     private static function parseHeader($line,$position)
     {
         try{

@@ -10,18 +10,23 @@ namespace Application\Controller;
 
 
 use Framework\Http\RequestInterface;
-use Framework\Http\Response;
+use Framework\Templating\ResponseRendererInterface;
 
 class HelloWorldController
 {
+    /**
+     * @var ResponseRendererInterface
+     */
+    private $renderer;
+
+    public function setRenderer(ResponseRendererInterface $renderer)
+    {
+        $this->renderer = $renderer;
+    }
+
     public function __invoke(RequestInterface $request)
     {
-        return new Response(
-            Response::HTTP_OK,
-            $request->getScheme(),
-            $request->getSchemeVersion(),
-            ["Content-Type"=>"application/json"],
-            json_encode(["hello" => "world"])
-        );
+        //return $this->renderer->renderResponse("hello.php",[ 'name'=>'hugo' ]);
+        return $this->renderer->renderResponse('hello.tpl', [ 'name' => 'hugo' ]);
     }
 }

@@ -20,5 +20,7 @@
         }
     },
     "minimum-stability": "dev",
-    "require": {}
+    "require": {
+        "twig/twig": "^1.23"
+    }
 }
