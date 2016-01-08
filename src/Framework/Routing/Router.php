@@ -1,57 +1,46 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Julien
- * Date: 07/01/2016
- * Time: 14:21
- */
 
 namespace Framework\Routing;
-
 
 use Framework\Routing\Loader\FileLoaderInterface;
 
 class Router implements RouterInterface
 {
-    /**
-     * @var Route[]
-     */
     private $routes;
-    private $configuration;
     private $loader;
+    private $configuration;
 
     /**
      * @param $configuration
      * @param FileLoaderInterface $loader
-     * @internal param RouteCollection $routes
      */
-    public function __construct(string $configuration,FileLoaderInterface $loader)
+    public function __construct(string $configuration, FileLoaderInterface $loader)
     {
         $this->configuration = $configuration;
         $this->loader = $loader;
     }
 
     /**
-     * @param $path
-     * @return array
-     * @throws RouterNotFoundException
-     */
-    public function match(string $path)
-    {
-        if($this->routes === null){
-            $this->routes = $this->loader->load($this->configuration);
-        }
-        if(!$route = $this->routes->match($path)){
-            throw new RouterNotFoundException("Not route found for path '$path'.");
-        }
-        return $route->getParameters();
-    }
-
-    /**
+     * @param RequestContext $context
      * @return mixed
      */
-    public function getRoutes()
+    public function match(RequestContext $context)
     {
-        return ($this->routes) ?: null;
+        if (null === $this->routes) {
+            $this->routes = $this->loader->load($this->configuration);
+        }
+
+        $path = $context->getPath();
+        if (!$route = $this->routes->match($path)) {
+            throw new RouteNotFoundException(sprintf('No route found for path %s.', $path));
+        }
+
+        $method = $context->getMethod();
+        $allowedMethods = $route->getMethods();
+        if (count($allowedMethods) && !in_array($method, $allowedMethods)) {
+            throw new MethodNotAllowedException($method, $allowedMethods);
+        }
+
+        return $route->getParameters();
     }
 }

@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__."/../vendor/autoload.php";
 
+use Framework\ControllerFactory;
 use Framework\Http\Request;
 use Framework\Http\StreamableInterface;
 use Framework\Kernel;
@@ -14,8 +15,7 @@ $loader->add(new PhpFileLoader());
 $loader->add(new XmlFileLoader());
 
 $router = new Router(__DIR__."/../config/routes.xml",$loader);
-$kernel = new Kernel($router);
-
+$kernel = new Kernel($router,new ControllerFactory());
 $response = $kernel->handle(Request::createFromGlobals());
 
 if($response instanceof StreamableInterface){

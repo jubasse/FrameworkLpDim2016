@@ -49,6 +49,10 @@ class RouteCollection implements \Iterator, \Countable
         return count($this->routes);
     }
 
+    /**
+     * @param RouteCollection $routes
+     * @param bool|false $override
+     */
     public function merge(RouteCollection $routes, $override = false)
     {
         foreach($routes as $name => $route){

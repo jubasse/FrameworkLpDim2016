@@ -1,94 +1,111 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Julien
- * Date: 07/01/2016
- * Time: 16:10
- */
 
 namespace Framework\Routing\Loader;
-
 
 use Framework\Routing\Route;
 use Framework\Routing\RouteCollection;
 
 class XmlFileLoader implements FileLoaderInterface
 {
+    /**
+     * @param $path
+     * @return RouteCollection
+     */
+    public function load(string $path)
+    {
+        if ('xml' !== pathinfo($path, PATHINFO_EXTENSION)) {
+            throw new UnsupportedFileTypeException(sprintf(
+                'File %s must be a valid XML file.',
+                $path
+            ));
+        }
+
+        if (!is_readable($path)) {
+            throw new \InvalidArgumentException(sprintf(
+                'File %s is not readable or does not exist.',
+                $path
+            ));
+        }
+
+        return $this->parseRoutes($path);
+    }
 
     /**
      * @param $path
      * @return RouteCollection
-     * @throws \UnsupportedFileTypeException
      */
-    public function load($path)
-    {
-        if('xml' !== pathinfo($path, PATHINFO_EXTENSION)){
-            throw new \UnsupportedFileTypeException("File $path must be a PHP file.");
-        }
-        if(!is_readable($path)){
-            throw new \InvalidArgumentException("File $path is not readable or not exists.");
-        }
-        return $this->parseRoutes($path);
-    }
-
-    private function parseRoutes($path)
+    private function parseRoutes(string $path)
     {
         $routes = new RouteCollection();
+
         $xml = new \SimpleXMLElement(file_get_contents($path));
-        foreach($xml->route as $route){
-            $this->parseRoute($routes,$route);
+        foreach ($xml->route as $route) {
+            $this->parseRoute($routes, $route);
         }
+
         return $routes;
     }
 
+    /**
+     * @param RouteCollection $routes
+     * @param \SimpleXMLElement $route
+     */
     private function parseRoute(RouteCollection $routes, \SimpleXMLElement $route)
     {
-        if (empty($route["name"])){
-            throw new \RuntimeException("Each route must have a unique name.");
-        }
-        if (empty($route["path"])){
-            throw new \RuntimeException("Each route must have a path.");
+        if (empty($route['name'])) {
+            throw new \RuntimeException('Each route must have a unique name.');
         }
 
-        $name = (string) $route["name"];
-        $path = (string) $route["path"];
+        $name = (string) $route['name'];
+        if (empty($route['path'])) {
+            throw new \RuntimeException(sprintf('Route %s must have a path.', $name));
+        }
 
-        $params = [];
-        $params = $this->parseRouteParams($route, $name, $params);
-        $routes->add($route["name"],new Route($path,$params));
+        $methods = [];
+        if (!empty($route['methods'])) {
+            $methods = explode('|', $route['methods']);
+        }
+
+        $params = $this->parseRouteParams($route, $name);
+
+        $routes->add($name, new Route((string) $route['path'], $params, $methods));
     }
 
     /**
      * @param \SimpleXMLElement $route
      * @param $name
-     * @param $params
-     * @return mixed
+     * @return array
      */
-    private function parseRouteParams(\SimpleXMLElement $route, $name, $params)
+    private function parseRouteParams(\SimpleXMLElement $route,string $name)
     {
-        if (count($route)) {
-            foreach ($route->param as $i => $param) {
-                $params = $this->parseRouteParam($name, $params, $param, $i);
-            }
+        $params = [];
+        if (!$route->count()) {
             return $params;
         }
+
+        foreach ($route->param as $position => $param) {
+            $params = array_merge($params, $this->parseRouteParam($name, $param, $position));
+        }
+
         return $params;
     }
 
     /**
      * @param $name
-     * @param $params
-     * @param $param
-     * @param $i
-     * @return mixed
+     * @param \SimpleXMLElement $param
+     * @param $position
+     * @return array
      */
-    private function parseRouteParam($name, $params, $param, $i)
+    private function parseRouteParam(string $name, \SimpleXMLElement $param, $position)
     {
-        if (empty($param["key"])) {
-            throw new \RuntimeException("Param $i for route $name must have a 'key' attribute");
+        if (empty($param['key'])) {
+            throw new \RuntimeException(sprintf(
+                'Parameter #%u for route %s must have a "key" attribute.',
+                $position,
+                $name
+            ));
         }
-        $key = (string)$param["key"];
-        $params[$key] = (string)$param;
-        return $params;
+
+        return [ (string) $param['key'] => (string) $param ];
     }
 }

@@ -15,5 +15,5 @@ interface FileLoaderInterface
      * @param $path
      * @return RouteCollection
      */
-    public function load($path);
+    public function load(string $path);
 }

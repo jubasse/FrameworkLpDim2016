@@ -1,50 +1,34 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Julien
- * Date: 07/01/2016
- * Time: 14:23
- */
 
 namespace Framework\Routing;
 
-
 class Route
 {
-    /**
-     * @var string
-     */
     private $path;
-    /**
-     * @var array
-     */
     private $parameters;
+    private $methods;
 
     /**
-     * Route constructor.
      * @param $path
-     * @param $parameters
+     * @param array $parameters
+     * @param array $methods
      */
-    public function __construct(string $path,array $parameters = [])
+    public function __construct(string $path, array $parameters = [], array $methods = [])
     {
         $this->path = $path;
         $this->parameters = $parameters;
+        $this->methods = $methods;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getPath()
+    public function getMethods()
     {
-        return $this->path;
-    }
+        $methods = $this->methods;
 
-    /**
-     * @return mixed
-     */
-    public function getParameters()
-    {
-        return $this->parameters;
+        if (in_array('GET', $methods) && !in_array('HEAD', $methods)) {
+            $methods[] = 'HEAD';
+        }
+
+        return $methods;
     }
 
     /**
@@ -53,6 +37,16 @@ class Route
      */
     public function match(string $path)
     {
-        return ($path === $this->path);
+        return $path === $this->path;
+    }
+
+    public function getPath()
+    {
+        return $this->path;
+    }
+
+    public function getParameters()
+    {
+        return $this->parameters;
     }
 }

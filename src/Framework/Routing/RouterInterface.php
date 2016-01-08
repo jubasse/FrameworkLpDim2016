@@ -1,19 +1,15 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Julien
- * Date: 07/01/2016
- * Time: 14:14
- */
 
 namespace Framework\Routing;
-
 
 interface RouterInterface
 {
     /**
-     * @param $path
-     * @return array
+     * Matches a url pattern with a set of attributes.
+     *
+     * @param RequestContext $context The request context
+     *
+     * @return array An array of attributes
      */
-    public function match(string $path);
+    public function match(RequestContext $context);
 }

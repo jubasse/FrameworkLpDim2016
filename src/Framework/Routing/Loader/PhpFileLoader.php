@@ -19,7 +19,7 @@ class PhpFileLoader implements FileLoaderInterface
      * @return RouteCollection
      * @throws \UnsupportedFileTypeException
      */
-    public function load($path)
+    public function load(string $path)
     {
         if('php' !== pathinfo($path, PATHINFO_EXTENSION)){
             throw new UnsupportedFileTypeException("File $path must be a PHP file.");

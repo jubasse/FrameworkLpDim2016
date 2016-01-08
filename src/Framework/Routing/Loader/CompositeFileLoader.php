@@ -35,7 +35,7 @@ class CompositeFileLoader implements FileLoaderInterface
      * @param $path
      * @return RouteCollection
      */
-    public function load($path)
+    public function load(string $path)
     {
         foreach($this->loaders as $loader){
             if($routes = $this->tryLoadFile($loader,$path)){
