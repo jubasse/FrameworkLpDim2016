@@ -8,26 +8,15 @@
 
 namespace Application\Controller;
 
-
+use Framework\AbstractController;
 use Framework\Http\RequestInterface;
-use Framework\Templating\ResponseRendererInterface;
 
-class HelloWorldController
+class HelloWorldController extends AbstractController
 {
-    /**
-     * @var ResponseRendererInterface
-     */
-    private $renderer;
-
-    public function setRenderer(ResponseRendererInterface $renderer)
-    {
-        $this->renderer = $renderer;
-    }
-
     public function __invoke(RequestInterface $request)
     {
         //return $this->renderer->renderResponse("hello.php",[ 'name'=>'hugo' ]);
         //return $this->renderer->renderResponse('hello.tpl', [ 'name' => 'hugo' ]);
-        return $this->renderer->renderResponse('hello.twig', [ 'name' => 'hugo' ]);
+        return $this->render('hello.twig', [ 'name' => 'hugo' ]);
     }
 }

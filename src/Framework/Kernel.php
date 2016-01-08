@@ -67,7 +67,7 @@ class Kernel implements KernelInterface
 
         $action = $this->controllers->createController($this->router->match($context));
 
-        if(method_exists($action,"setRenderer")){
+        if($action instanceof AbstractController){
             $action->setRenderer($this->renderer);
         }
 
