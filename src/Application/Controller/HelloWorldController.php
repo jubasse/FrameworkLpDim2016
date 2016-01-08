@@ -27,6 +27,7 @@ class HelloWorldController
     public function __invoke(RequestInterface $request)
     {
         //return $this->renderer->renderResponse("hello.php",[ 'name'=>'hugo' ]);
-        return $this->renderer->renderResponse('hello.tpl', [ 'name' => 'hugo' ]);
+        //return $this->renderer->renderResponse('hello.tpl', [ 'name' => 'hugo' ]);
+        return $this->renderer->renderResponse('hello.twig', [ 'name' => 'hugo' ]);
     }
 }
